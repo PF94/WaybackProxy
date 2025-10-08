@@ -7,5 +7,7 @@
     "WAYBACK_API": false,
     "CONTENT_TYPE_ENCODING": true,
     "SILENT": false,
-    "SETTINGS_PAGE": true
+    "SETTINGS_PAGE": true,
+    "RELATIVE": true,
+    "RELATIVE_YEARS": 20
 }

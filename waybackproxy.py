@@ -93,11 +93,17 @@ class SharedState:
 		self.http = urllib3.PoolManager(maxsize=4, block=True)
 		urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+		if RELATIVE:
+			max = 3600 # 1 hour
+			pass
+		else:
+			max = 86400 # 1 day
+
 		# Create internal LRU dictionary for preserving URLs on redirect.
-		self.date_cache = LRUDict(maxduration=86400, maxsize=1024)
+		self.date_cache = LRUDict(maxduration=max, maxsize=1024)
 
 		# Create internal LRU dictionary for date availability.
-		self.availability_cache = LRUDict(maxduration=86400, maxsize=1024)
+		self.availability_cache = LRUDict(maxduration=max, maxsize=1024)
 
 		# Read domain whitelist file.
 		try:
@@ -136,7 +142,17 @@ class Handler(socketserver.BaseRequestHandler):
 		# read out the headers
 		request_host = None
 		pac_host = '" + location.host + ":' + str(LISTEN_PORT) # may not actually work
-		effective_date = DATE
+		
+		if RELATIVE == True:
+			now = datetime.datetime.now()
+			relative_year = now.year - RELATIVE_YEARS
+			new_date = datetime.datetime(relative_year, now.month, now.day, now.hour, now.minute, now.second)
+			effective_date = new_date.strftime('%Y%m%d%H%M%S')
+		else:
+			effective_date = DATE
+
+		print(effective_date[:14])
+
 		auth = None
 		while line.strip() != '':
 			line = f.readline()
@@ -730,9 +746,13 @@ def _print(*args, **kwargs):
 
 def main():
 	"""Starts the server."""
+	ThreadingTCPServer.allow_reuse_address = True
 	server = ThreadingTCPServer(('', LISTEN_PORT), Handler)
 	_print('[-] Now listening on port', LISTEN_PORT)
-	_print('[-] Date set to', DATE)
+	if RELATIVE:
+		_print('[-] Relative time set to', RELATIVE_YEARS)
+	else:
+		_print('[-] Date set to', DATE)
 	try:
 		server.serve_forever()
 	except KeyboardInterrupt: # Ctrl+C to stop

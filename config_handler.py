@@ -40,6 +40,12 @@ global SILENT
 # Enables the settings page on http://web.archive.org if set to True.
 global SETTINGS_PAGE
 
+# Enables for relative date, which uses RELATIVE_YEARS to calculate the date.
+global RELATIVE
+
+# Number of years to go back from the current date if RELATIVE is True.
+global RELATIVE_YEARS
+
 with open('config.json', 'r', encoding='utf8', errors='ignore') as f:
 	data = json.loads(f.read())
 	LISTEN_PORT = data['LISTEN_PORT']
@@ -51,3 +57,5 @@ with open('config.json', 'r', encoding='utf8', errors='ignore') as f:
 	CONTENT_TYPE_ENCODING = data['CONTENT_TYPE_ENCODING']
 	SILENT = data['SILENT']
 	SETTINGS_PAGE = data['SETTINGS_PAGE']
+	RELATIVE = data['RELATIVE']
+	RELATIVE_YEARS = data['RELATIVE_YEARS']
